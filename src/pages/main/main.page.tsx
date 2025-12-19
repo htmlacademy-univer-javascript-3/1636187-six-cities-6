@@ -1,4 +1,3 @@
-import { TMainPageProps } from '../../app';
 import {
   PlaceCard,
   TPlaceCardProps,
@@ -57,7 +56,7 @@ const listPlaceCard: (TPlaceCardProps & { id: number })[] = [
   },
 ];
 
-export const MainPage = ({ cardQuantity }: TMainPageProps) => (
+export const MainPage = () => (
   <div className="page page--gray page--main">
     <header className="header">
       <div className="container">
