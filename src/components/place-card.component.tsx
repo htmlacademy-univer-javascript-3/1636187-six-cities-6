@@ -1,4 +1,4 @@
-export type TPlaceCard = {
+export type TPlaceCardProps = {
   cost: number;
   type: string;
   name: string;
@@ -16,7 +16,7 @@ export const PlaceCard = ({
   img,
   isSaved,
   isPremium,
-}: TPlaceCard) => {
+}: TPlaceCardProps) => {
   const tagSaved = (statusSaved: boolean) => {
     if (statusSaved) {
       return (

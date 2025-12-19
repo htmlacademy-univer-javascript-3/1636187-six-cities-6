@@ -1,6 +1,10 @@
-import { PlaceCard, TPlaceCard } from '../../components/place-card.component';
+import { TMainPageProps } from '../../app';
+import {
+  PlaceCard,
+  TPlaceCardProps,
+} from '../../components/place-card.component';
 
-const listPlaceCard: (TPlaceCard & { id: number })[] = [
+const listPlaceCard: (TPlaceCardProps & { id: number })[] = [
   {
     id: 1,
     cost: 120,
@@ -53,7 +57,7 @@ const listPlaceCard: (TPlaceCard & { id: number })[] = [
   },
 ];
 
-export const MainPage = () => (
+export const MainPage = ({ cardQuantity }: TMainPageProps) => (
   <div className="page page--gray page--main">
     <header className="header">
       <div className="container">
