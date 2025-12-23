@@ -1,31 +1,46 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { AppRoute, AuthorizationStatus } from './const';
-import LoginPage from './pages/login/login.page';
-import MainPage from './pages/main/main-page';
-import { Page404 } from './pages/page-404/page-404.page';
-import PrivateRoute from './components/private-route/private-route.component';
-import { OfferType } from './types/offer';
-import { ReviewType } from './types/review';
+
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import PrivateRoute from './components/private-route/private-route';
+import { AppRoute } from './const';
 import FavoritesPage from './pages/favorites/favorites-page';
+import LoginPage from './pages/login/login-page';
+import MainPage from './pages/main/main-page';
 import OfferPage from './pages/offer/offer-page';
+import { AppDispatchType } from './store';
+import { OfferType } from './types/offer';
 import { OfferPreviewType } from './types/offer-preview';
+import { ReviewType } from './types/review';
+import Page404 from './pages/page-404/page-404';
+import { fetchCheckAuth } from './store/user/action';
 
-
-export const App = () => {
+function App() {
   const offers: OfferPreviewType[] = [];
   const offerId: OfferType[] = [];
   const reviews: ReviewType[] = [];
+  const dispatch = useDispatch<AppDispatchType>();
+
+  useEffect(() => {
+    dispatch(fetchCheckAuth());
+  }, [dispatch]);
 
   return (
     <BrowserRouter>
       <Routes>
-        <Route path={AppRoute.Main} element={<MainPage />} />
-        <Route path={AppRoute.Login} element={<LoginPage />} />
+        <Route
+          path={AppRoute.Main}
+          element={<MainPage/>}
+        />
+        <Route
+          path={AppRoute.Login}
+          element={<LoginPage/>}
+        />
         <Route
           path={AppRoute.Favorites}
           element={
-            <PrivateRoute authorizationStatus={AuthorizationStatus.Auth}>
-              <FavoritesPage offers={offers} />
+            <PrivateRoute>
+              <FavoritesPage offers={offers}/>
             </PrivateRoute>
           }
         />
@@ -33,8 +48,13 @@ export const App = () => {
           path={`${AppRoute.Offer}/:id`}
           element={<OfferPage offers={offerId} offersNearby={offers} reviews={reviews}/>}
         />
-        <Route path={AppRoute.Page404} element={<Page404 />} />
+        <Route
+          path={AppRoute.Page404}
+          element={<Page404/>}
+        />
       </Routes>
     </BrowserRouter>
   );
-};
+}
+
+export default App;
