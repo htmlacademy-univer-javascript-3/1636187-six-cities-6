@@ -1,7 +1,7 @@
-import { userReducer } from '../reducer';
-import { setAuthorizationStatus, setUserInfo } from '../action';
+import { selectUserInfo, selectAuthorizationStatus, selectIsAuth } from '../selectors';
 import { AuthorizationStatus } from '../../../const';
 import { UserAuthType } from '../../../types/user-auth';
+import { RootState } from '../..';
 
 const mockUser: UserAuthType = {
   email: 'test@example.com',
@@ -11,56 +11,73 @@ const mockUser: UserAuthType = {
   token: 'token123',
 };
 
-const initialState = {
-  authorizationStatus: AuthorizationStatus.Unknown,
-  userInfo: null,
-};
+describe('user selectors', () => {
+  const baseState: RootState = {
+    user: {
+      authorizationStatus: AuthorizationStatus.Unknown,
+      userInfo: null,
+    },
+  } as RootState;
 
-describe('userReducer', () => {
-  it('should return the initial state when passed an empty action', () => {
-    const state = userReducer(undefined, { type: '' });
-    expect(state).toEqual(initialState);
+  it('selectUserInfo should return userInfo', () => {
+    expect(selectUserInfo(baseState)).toBeNull();
+
+    const stateWithUser: RootState = {
+      ...baseState,
+      user: {
+        ...baseState.user,
+        userInfo: mockUser,
+      },
+    } as RootState;
+
+    expect(selectUserInfo(stateWithUser)).toEqual(mockUser);
   });
 
-  it('should handle setAuthorizationStatus to Auth', () => {
-    const state = userReducer(initialState, setAuthorizationStatus(AuthorizationStatus.Auth));
-    expect(state.authorizationStatus).toBe(AuthorizationStatus.Auth);
-    expect(state.userInfo).toBeNull();
+  it('selectAuthorizationStatus should return authorizationStatus', () => {
+    expect(selectAuthorizationStatus(baseState)).toBe(AuthorizationStatus.Unknown);
+
+    const stateAuth: RootState = {
+      ...baseState,
+      user: {
+        ...baseState.user,
+        authorizationStatus: AuthorizationStatus.Auth,
+      },
+    } as RootState;
+
+    expect(selectAuthorizationStatus(stateAuth)).toBe(AuthorizationStatus.Auth);
   });
 
-  it('should handle setAuthorizationStatus to NoAuth', () => {
-    const state = userReducer(
-      { ...initialState, authorizationStatus: AuthorizationStatus.Auth },
-      setAuthorizationStatus(AuthorizationStatus.NoAuth)
-    );
-    expect(state.authorizationStatus).toBe(AuthorizationStatus.NoAuth);
+  it('selectIsAuth should return true if status is Auth', () => {
+    const stateAuth: RootState = {
+      ...baseState,
+      user: {
+        ...baseState.user,
+        authorizationStatus: AuthorizationStatus.Auth,
+      },
+    } as RootState;
+
+    expect(selectIsAuth(stateAuth)).toBe(true);
   });
 
-  it('should handle setUserInfo with a user', () => {
-    const state = userReducer(initialState, setUserInfo(mockUser));
-    expect(state.userInfo).toEqual(mockUser);
-    expect(state.authorizationStatus).toBe(AuthorizationStatus.Unknown);
-  });
+  it('selectIsAuth should return false if status is not Auth', () => {
+    const stateNoAuth: RootState = {
+      ...baseState,
+      user: {
+        ...baseState.user,
+        authorizationStatus: AuthorizationStatus.NoAuth,
+      },
+    } as RootState;
 
-  it('should handle setUserInfo with null', () => {
-    const state = userReducer(
-      { ...initialState, userInfo: mockUser },
-      setUserInfo(null)
-    );
-    expect(state.userInfo).toBeNull();
-  });
+    expect(selectIsAuth(stateNoAuth)).toBe(false);
 
-  it('should correctly handle sequence of actions', () => {
-    let state = userReducer(initialState, setAuthorizationStatus(AuthorizationStatus.Auth));
-    state = userReducer(state, setUserInfo(mockUser));
+    const stateUnknown: RootState = {
+      ...baseState,
+      user: {
+        ...baseState.user,
+        authorizationStatus: AuthorizationStatus.Unknown,
+      },
+    } as RootState;
 
-    expect(state.authorizationStatus).toBe(AuthorizationStatus.Auth);
-    expect(state.userInfo).toEqual(mockUser);
-
-    state = userReducer(state, setAuthorizationStatus(AuthorizationStatus.NoAuth));
-    state = userReducer(state, setUserInfo(null));
-
-    expect(state.authorizationStatus).toBe(AuthorizationStatus.NoAuth);
-    expect(state.userInfo).toBeNull();
+    expect(selectIsAuth(stateUnknown)).toBe(false);
   });
 });
